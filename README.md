@@ -1,6 +1,7 @@
 # logger
 
-HTTP logger middleware for Go
+HTTP logger middleware for Go.
+Forked from the apparently dead repo github.com/go-http-utils/logger
 
 ## Installation
 
