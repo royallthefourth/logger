@@ -46,7 +46,7 @@ func slowHandler(w http.ResponseWriter, r *http.Request) {
 
 func (s *LoggerSuite) TestSlowHandler() {
 	tw := testWriter{}
-	dh := Handler(http.NotFoundHandler(), &tw, TinyLoggerType)
+	dh := Handler(http.NotFoundHandler(), &tw, TinyLogger)
 
 	dh.ServeHTTP(s.rl, s.req)
 
@@ -55,7 +55,7 @@ func (s *LoggerSuite) TestSlowHandler() {
 
 func (s *LoggerSuite) TestHandler() {
 	tw := testWriter{}
-	dh := Handler(http.NotFoundHandler(), &tw, TinyLoggerType)
+	dh := Handler(http.NotFoundHandler(), &tw, TinyLogger)
 
 	dh.ServeHTTP(s.rl, s.req)
 
@@ -64,9 +64,9 @@ func (s *LoggerSuite) TestHandler() {
 
 func (s *LoggerSuite) TestTiny() {
 	lh := loggerHandler{
-		h:          http.NotFoundHandler(),
-		formatType: TinyLoggerType,
-		writer:     s.w,
+		h:      http.NotFoundHandler(),
+		logger: TinyLogger,
+		writer: s.w,
 	}
 	lh.write(s.rl, s.req)
 
@@ -75,9 +75,9 @@ func (s *LoggerSuite) TestTiny() {
 
 func (s *LoggerSuite) TestShort() {
 	lh := loggerHandler{
-		h:          http.NotFoundHandler(),
-		formatType: ShortLoggerType,
-		writer:     s.w,
+		h:      http.NotFoundHandler(),
+		logger: ShortLogger,
+		writer: s.w,
 	}
 	lh.write(s.rl, s.req)
 
@@ -86,9 +86,9 @@ func (s *LoggerSuite) TestShort() {
 
 func (s *LoggerSuite) TestDev() {
 	lh := loggerHandler{
-		h:          http.NotFoundHandler(),
-		formatType: DevLoggerType,
-		writer:     s.w,
+		h:      http.NotFoundHandler(),
+		logger: DevLogger,
+		writer: s.w,
 	}
 	lh.write(s.rl, s.req)
 
@@ -97,9 +97,9 @@ func (s *LoggerSuite) TestDev() {
 
 func (s *LoggerSuite) TestCommon() {
 	lh := loggerHandler{
-		h:          http.NotFoundHandler(),
-		formatType: CommonLoggerType,
-		writer:     s.w,
+		h:      http.NotFoundHandler(),
+		logger: CommonLogger,
+		writer: s.w,
 	}
 	lh.write(s.rl, s.req)
 
@@ -108,9 +108,9 @@ func (s *LoggerSuite) TestCommon() {
 
 func (s *LoggerSuite) TestCombined() {
 	lh := loggerHandler{
-		h:          http.NotFoundHandler(),
-		formatType: CombineLoggerType,
-		writer:     s.w,
+		h:      http.NotFoundHandler(),
+		logger: CombinedLogger,
+		writer: s.w,
 	}
 	lh.write(s.rl, s.req)
 

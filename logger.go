@@ -10,46 +10,103 @@ import (
 	"time"
 )
 
-// Type represents logger's type
-type Type int
+const timeFormat = "02/Jan/2006:15:04:05 -0700"
 
-const (
-	// CombineLoggerType is the standard Apache combined log output
-	//
-	// format:
-	//
-	// :remote-addr - :remote-user [:date[clf]] ":method :url
-	// HTTP/:http-version" :status :res[content-length] ":referrer" ":user-agent"
-	CombineLoggerType Type = iota
-	// CommonLoggerType is the standard Apache common log output
-	//
-	// format:
-	//
-	// :remote-addr - :remote-user [:date[clf]] ":method :url
-	// HTTP/:http-version" :status :res[content-length]
-	CommonLoggerType
-	// DevLoggerType is useful for development
-	//
-	// format:
-	//
-	// :method :url :status :response-time ms - :res[content-length]
-	DevLoggerType
-	// ShortLoggerType is shorter than common, including response time
-	//
-	// format:
-	//
-	// :remote-addr :remote-user :method :url HTTP/:http-version :status
-	// :res[content-length] - :response-time ms
-	ShortLoggerType
-	// TinyLoggerType is the minimal output
-	//
-	// format:
-	//
-	// :method :url :status :res[content-length] - :response-time ms
-	TinyLoggerType
+type Logger func(rl *responseLogger, req *http.Request, username string) string
 
-	timeFormat = "02/Jan/2006:15:04:05 -0700"
-)
+// CombinedLogger is the standard Apache combined log output
+//
+// format:
+//
+// :remote-addr - :remote-user [:date[clf]] ":method :url
+// HTTP/:http-version" :status :res[content-length] ":referrer" ":user-agent"
+func CombinedLogger(rl *responseLogger, req *http.Request, username string) string {
+	return strings.Join([]string{
+		req.RemoteAddr,
+		"-",
+		username,
+		"[" + rl.start.Format(timeFormat) + "]",
+		`"` + req.Method,
+		req.RequestURI,
+		req.Proto + `"`,
+		strconv.Itoa(rl.status),
+		strconv.Itoa(rl.size),
+		`"` + req.Referer() + `"`,
+		`"` + req.UserAgent() + `"`,
+	}, " ")
+}
+
+// CommonLogger is the standard Apache common log output
+//
+// format:
+//
+// :remote-addr - :remote-user [:date[clf]] ":method :url
+// HTTP/:http-version" :status :res[content-length]
+func CommonLogger(rl *responseLogger, req *http.Request, username string) string {
+	return strings.Join([]string{
+		req.RemoteAddr,
+		"-",
+		username,
+		"[" + rl.start.Format(timeFormat) + "]",
+		`"` + req.Method,
+		req.RequestURI,
+		req.Proto + `"`,
+		strconv.Itoa(rl.status),
+		strconv.Itoa(rl.size),
+	}, " ")
+}
+
+// DevLogger is useful for development
+//
+// format:
+//
+// :method :url :status :response-time ms - :res[content-length]
+func DevLogger(rl *responseLogger, req *http.Request, username string) string {
+	return strings.Join([]string{
+		req.Method,
+		req.RequestURI,
+		strconv.Itoa(rl.status),
+		parseResponseTime(rl.start),
+		"-",
+		strconv.Itoa(rl.size),
+	}, " ")
+}
+
+// ShortLogger is shorter than common, but includes response time
+//
+// format:
+//
+// :remote-addr :remote-user :method :url HTTP/:http-version :status
+// :res[content-length] - :response-time ms
+func ShortLogger(rl *responseLogger, req *http.Request, username string) string {
+	return strings.Join([]string{
+		req.RemoteAddr,
+		username,
+		req.Method,
+		req.RequestURI,
+		req.Proto,
+		strconv.Itoa(rl.status),
+		strconv.Itoa(rl.size),
+		"-",
+		parseResponseTime(rl.start),
+	}, " ")
+}
+
+// TinyLogger is the smallest format
+//
+// format:
+//
+// :method :url :status :res[content-length] - :response-time ms
+func TinyLogger(rl *responseLogger, req *http.Request, username string) string {
+	return strings.Join([]string{
+		req.Method,
+		req.RequestURI,
+		strconv.Itoa(rl.status),
+		strconv.Itoa(rl.size),
+		"-",
+		parseResponseTime(rl.start),
+	}, " ")
+}
 
 type responseLogger struct {
 	rw     http.ResponseWriter
@@ -89,9 +146,9 @@ func (rl *responseLogger) Flush() {
 }
 
 type loggerHandler struct {
-	h          http.Handler
-	formatType Type
-	writer     io.Writer
+	logger Logger
+	h      http.Handler
+	writer io.Writer
 }
 
 func (rh loggerHandler) ServeHTTP(res http.ResponseWriter, req *http.Request) {
@@ -111,64 +168,7 @@ func (rh loggerHandler) write(rl *responseLogger, req *http.Request) {
 		}
 	}
 
-	switch rh.formatType {
-	case CombineLoggerType:
-		fmt.Fprintln(rh.writer, strings.Join([]string{
-			req.RemoteAddr,
-			"-",
-			username,
-			"[" + rl.start.Format(timeFormat) + "]",
-			`"` + req.Method,
-			req.RequestURI,
-			req.Proto + `"`,
-			strconv.Itoa(rl.status),
-			strconv.Itoa(rl.size),
-			`"` + req.Referer() + `"`,
-			`"` + req.UserAgent() + `"`,
-		}, " "))
-	case CommonLoggerType:
-		fmt.Fprintln(rh.writer, strings.Join([]string{
-			req.RemoteAddr,
-			"-",
-			username,
-			"[" + rl.start.Format(timeFormat) + "]",
-			`"` + req.Method,
-			req.RequestURI,
-			req.Proto + `"`,
-			strconv.Itoa(rl.status),
-			strconv.Itoa(rl.size),
-		}, " "))
-	case DevLoggerType:
-		fmt.Fprintln(rh.writer, strings.Join([]string{
-			req.Method,
-			req.RequestURI,
-			strconv.Itoa(rl.status),
-			parseResponseTime(rl.start),
-			"-",
-			strconv.Itoa(rl.size),
-		}, " "))
-	case ShortLoggerType:
-		fmt.Fprintln(rh.writer, strings.Join([]string{
-			req.RemoteAddr,
-			username,
-			req.Method,
-			req.RequestURI,
-			req.Proto,
-			strconv.Itoa(rl.status),
-			strconv.Itoa(rl.size),
-			"-",
-			parseResponseTime(rl.start),
-		}, " "))
-	case TinyLoggerType:
-		fmt.Fprintln(rh.writer, strings.Join([]string{
-			req.Method,
-			req.RequestURI,
-			strconv.Itoa(rl.status),
-			strconv.Itoa(rl.size),
-			"-",
-			parseResponseTime(rl.start),
-		}, " "))
-	}
+	fmt.Fprintln(rh.writer, rh.logger(rl, req, username))
 }
 
 func parseResponseTime(start time.Time) string {
@@ -176,21 +176,21 @@ func parseResponseTime(start time.Time) string {
 }
 
 // DefaultHandler returns a http.Handler that wraps h by using
-// Apache combined log output and print to os.Stdout
+// Apache combined log output and prints to os.Stdout
 func DefaultHandler(h http.Handler) http.Handler {
 	return loggerHandler{
-		h:          h,
-		formatType: CombineLoggerType,
-		writer:     os.Stdout,
+		h:      h,
+		logger: CombinedLogger,
+		writer: os.Stdout,
 	}
 }
 
 // Handler returns a http.Handler that wraps h by using t type log output
 // and print to writer
-func Handler(h http.Handler, writer io.Writer, t Type) http.Handler {
+func Handler(h http.Handler, writer io.Writer, logger Logger) http.Handler {
 	return loggerHandler{
-		h:          h,
-		formatType: t,
-		writer:     writer,
+		h:      h,
+		logger: logger,
+		writer: writer,
 	}
 }

@@ -32,9 +32,9 @@ http.ListenAndServe(":8080", logger.Handler(mux, os.Stdout, logger.DevLoggerType
 
 ## Supported log output formats
 
-### CombineLoggerType
+### CombinedLoggerType
 
-CombineLoggerType is the standard Apache combined log output
+CombinedLoggerType is the standard Apache combined log output
 
 ```
 :remote-addr - :remote-user [:date[clf]] ":method :url HTTP/:http-version" :status :res[content-length] ":referrer" ":user-agent"

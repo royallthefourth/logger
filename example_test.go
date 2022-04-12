@@ -23,5 +23,5 @@ func Example_handler() {
 	})
 
 	http.ListenAndServe(":8080", logger.Handler(mux, os.Stdout,
-		logger.DevLoggerType))
+		logger.DevLogger))
 }
