@@ -4,7 +4,7 @@
 //   "net/http"
 // 	 "os"
 //
-//   "github.com/go-http-utils/logger"
+//   "github.com/royallthefourth/logger"
 // )
 //
 // mux := http.NewServeMux()

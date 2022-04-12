@@ -14,9 +14,6 @@ import (
 type Type int
 
 const (
-	// Version is this package's version
-	Version = "0.3.0"
-
 	// CombineLoggerType is the standard Apache combined log output
 	//
 	// format:
@@ -175,7 +172,7 @@ func (rh loggerHanlder) write(rl *responseLogger, req *http.Request) {
 }
 
 func parseResponseTime(start time.Time) string {
-	return fmt.Sprintf("%.3f ms", time.Now().Sub(start).Seconds()/1e6)
+	return fmt.Sprintf("%d ms", time.Now().Sub(start).Milliseconds())
 }
 
 // DefaultHandler returns a http.Handler that wraps h by using

@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/go-http-utils/logger"
+	"github.com/royallthefourth/logger"
 )
 
 func Example_DefaultHandler() {

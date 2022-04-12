@@ -1,18 +1,16 @@
 # logger
-[![Build Status](https://travis-ci.org/go-http-utils/logger.svg?branch=master)](https://travis-ci.org/go-http-utils/logger)
-[![Coverage Status](https://coveralls.io/repos/github/go-http-utils/logger/badge.svg?branch=master)](https://coveralls.io/github/go-http-utils/logger?branch=master)
 
 HTTP logger middleware for Go
 
 ## Installation
 
 ```sh
-go get -u github.com/go-http-utils/logger
+go get -u github.com/royallthefourth/logger
 ```
 
 ## Documentation
 
-https://godoc.org/github.com/go-http-utils/logger
+https://godoc.org/github.com/royallthefourth/logger
 
 ## Usage
 
@@ -21,7 +19,7 @@ import (
   "net/http"
   "os"
 
-  "github.com/go-http-utils/logger"
+  "github.com/royallthefourth/logger"
 )
 
 mux := http.NewServeMux()

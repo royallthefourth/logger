@@ -34,19 +34,32 @@ func (s *LoggerSuite) TestRW() {
 	s.Equal(s.rl.status, http.StatusAccepted)
 }
 
-func (s *LoggerSuite) TestDefaultHanlder() {
+func (s *LoggerSuite) TestDefaultHandler() {
 	dh := DefaultHandler(http.NotFoundHandler())
 
 	dh.ServeHTTP(s.rl, s.req)
 }
 
-func (s *LoggerSuite) TestHanlder() {
+func slowHandler(w http.ResponseWriter, r *http.Request) {
+
+}
+
+func (s *LoggerSuite) TestSlowHandler() {
 	tw := testWriter{}
 	dh := Handler(http.NotFoundHandler(), &tw, TinyLoggerType)
 
 	dh.ServeHTTP(s.rl, s.req)
 
-	s.Equal("GET / 404 19 - 0.000 ms\n", string(tw.Bytes))
+	s.Equal("GET / 404 19 - 0 ms\n", string(tw.Bytes))
+}
+
+func (s *LoggerSuite) TestHandler() {
+	tw := testWriter{}
+	dh := Handler(http.NotFoundHandler(), &tw, TinyLoggerType)
+
+	dh.ServeHTTP(s.rl, s.req)
+
+	s.Equal("GET / 404 19 - 0 ms\n", string(tw.Bytes))
 }
 
 func (s *LoggerSuite) TestTiny() {
@@ -57,7 +70,7 @@ func (s *LoggerSuite) TestTiny() {
 	}
 	lh.write(s.rl, s.req)
 
-	s.Equal("GET / 200 11 - 0.000 ms\n", string(s.w.Bytes))
+	s.Equal("GET / 200 11 - 0 ms\n", string(s.w.Bytes))
 }
 
 func (s *LoggerSuite) TestShort() {
@@ -68,7 +81,7 @@ func (s *LoggerSuite) TestShort() {
 	}
 	lh.write(s.rl, s.req)
 
-	s.Equal("192.0.2.1:1234 - GET / HTTP/1.1 200 11 - 0.000 ms\n", string(s.w.Bytes))
+	s.Equal("192.0.2.1:1234 - GET / HTTP/1.1 200 11 - 0 ms\n", string(s.w.Bytes))
 }
 
 func (s *LoggerSuite) TestDev() {
@@ -79,7 +92,7 @@ func (s *LoggerSuite) TestDev() {
 	}
 	lh.write(s.rl, s.req)
 
-	s.Equal("GET / 200 0.000 ms - 11\n", string(s.w.Bytes))
+	s.Equal("GET / 200 0 ms - 11\n", string(s.w.Bytes))
 }
 
 func (s *LoggerSuite) TestCommon() {
@@ -134,4 +147,9 @@ func (tw *testWriter) Write(b []byte) (n int, err error) {
 	tw.Bytes = append(tw.Bytes, b...)
 
 	return len(b), nil
+}
+
+func Test_parseResponseTime(t *testing.T) {
+	start := time.Now().Add(time.Duration(-10) * time.Millisecond)
+	t.Logf("Time diff of %s\n", parseResponseTime(start))
 }
