@@ -7,7 +7,7 @@ import (
 	"github.com/royallthefourth/logger"
 )
 
-func Example_DefaultHandler() {
+func Example_defaultHandler() {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", func(res http.ResponseWriter, req *http.Request) {
 		res.Write([]byte("Hello World"))
@@ -16,7 +16,7 @@ func Example_DefaultHandler() {
 	http.ListenAndServe(":8080", logger.DefaultHandler(mux))
 }
 
-func Example_Handler() {
+func Example_handler() {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", func(res http.ResponseWriter, req *http.Request) {
 		res.Write([]byte("Hello World"))

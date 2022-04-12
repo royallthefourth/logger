@@ -63,7 +63,7 @@ func (s *LoggerSuite) TestHandler() {
 }
 
 func (s *LoggerSuite) TestTiny() {
-	lh := loggerHanlder{
+	lh := loggerHandler{
 		h:          http.NotFoundHandler(),
 		formatType: TinyLoggerType,
 		writer:     s.w,
@@ -74,7 +74,7 @@ func (s *LoggerSuite) TestTiny() {
 }
 
 func (s *LoggerSuite) TestShort() {
-	lh := loggerHanlder{
+	lh := loggerHandler{
 		h:          http.NotFoundHandler(),
 		formatType: ShortLoggerType,
 		writer:     s.w,
@@ -85,7 +85,7 @@ func (s *LoggerSuite) TestShort() {
 }
 
 func (s *LoggerSuite) TestDev() {
-	lh := loggerHanlder{
+	lh := loggerHandler{
 		h:          http.NotFoundHandler(),
 		formatType: DevLoggerType,
 		writer:     s.w,
@@ -96,7 +96,7 @@ func (s *LoggerSuite) TestDev() {
 }
 
 func (s *LoggerSuite) TestCommon() {
-	lh := loggerHanlder{
+	lh := loggerHandler{
 		h:          http.NotFoundHandler(),
 		formatType: CommonLoggerType,
 		writer:     s.w,
@@ -107,7 +107,7 @@ func (s *LoggerSuite) TestCommon() {
 }
 
 func (s *LoggerSuite) TestCombined() {
-	lh := loggerHanlder{
+	lh := loggerHandler{
 		h:          http.NotFoundHandler(),
 		formatType: CombineLoggerType,
 		writer:     s.w,

@@ -30,7 +30,7 @@ mux.HandleFunc("/", func(res http.ResponseWriter, req *http.Request) {
 http.ListenAndServe(":8080", logger.Handler(mux, os.Stdout, logger.DevLoggerType))
 ```
 
-## Supportted log output format
+## Supported log output formats
 
 ### CombineLoggerType
 
@@ -66,7 +66,7 @@ ShortLoggerType is shorter than common, including response time
 
 ### TinyLoggerType
 
-TinyLoggerType is the minimal ouput
+TinyLoggerType is the minimal output
 
 ```
 :method :url :status :res[content-length] - :response-time ms
